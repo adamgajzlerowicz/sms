@@ -4,13 +4,21 @@ import {
     StackNavigator,
 } from 'react-navigation';
 import { Provider } from 'react-redux';
-import { combineReducers, createStore } from 'redux';
+import { combineReducers, createStore, compose } from 'redux';
 import { reducer as messages } from './src/state/message';
 import { reducer as config } from './src/state/config';
+import persistState, { mergePersistedState } from 'redux-localstorage';
+import {AsyncStorage} from 'react-native';
+import adapter from 'redux-localstorage/lib/adapters/AsyncStorage';
 
-const rootReducer = combineReducers({messages, config});
 
-const store = createStore(rootReducer);
+const rootReducer = compose(mergePersistedState())(combineReducers({messages, config}));
+
+
+const storage = adapter(AsyncStorage);
+const enchancer = compose(persistState(storage, 'redux'));
+
+const store = createStore(rootReducer, {}, enchancer);
 
 store.subscribe(()=>alert(JSON.stringify(store.getState())));
 import HomeScreen from './src/HomeScreen';

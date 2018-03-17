@@ -1,3 +1,5 @@
+// @flow
+
 import React, { Component } from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux'
@@ -36,7 +38,7 @@ class HomeScreen extends Component {
         });
     }
 
-    sendSMSFunction(type) { //ON | OFF
+    sendSMSFunction(type: 'ON' | 'OFF') {
         const { number, contentOn, contentOff } = this.props.config;
         
         if (!number) {

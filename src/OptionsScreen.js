@@ -15,15 +15,16 @@ class OptionsScreen extends React.Component {
     };
 
     state = {
-        number: this.props.number,
-        messageOn: this.props.messageOn,
-        messageOff: this.props.messageOff
+        number: this.props.config.number,
+        messageOn: this.props.config.messageOn,
+        messageOff: this.props.config.messageOff
     };
 
     setData() {
         this.props.setConfig(this.state);
         ToastAndroid.show('Zapisano', ToastAndroid.SHORT);
     };
+
 
     render() {
         // const { navigate } = this.props.navigation;
