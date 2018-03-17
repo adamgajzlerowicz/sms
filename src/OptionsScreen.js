@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import {
     View, 
     ToastAndroid,
-    AsyncStorage,
     TextInput,
     Button
 } from 'react-native';
@@ -24,7 +23,6 @@ class OptionsScreen extends React.Component {
         this.props.setConfig(this.state);
         ToastAndroid.show('Zapisano', ToastAndroid.SHORT);
     };
-
 
     render() {
         // const { navigate } = this.props.navigation;

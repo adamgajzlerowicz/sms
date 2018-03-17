@@ -11,7 +11,7 @@ const reducer = (state = [], action)=>{
 
 };
 
-const addMessage = (message)=>({ type: ADD_MESSAGE, payload: message });
+const addMessage = message =>({ type: ADD_MESSAGE, payload: message });
 
 
 export {

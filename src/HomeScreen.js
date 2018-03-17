@@ -18,7 +18,7 @@ import {
 const { SMS } = NativeModules;
 
 const Row = ({ id, status, type })=> {
-    return <Text style={{padding: 10}}> {type}: {moment(id).format('YYYY-MM-DD HH:mm:ss')} {':         '} {status} </Text>;
+    return <Text style={{padding: 10}}> {type}: {moment(Number(id)).format('YYYY-MM-DD HH:mm:ss')} {':         '} {status} </Text>;
 };
 
 
@@ -27,19 +27,16 @@ class HomeScreen extends Component {
         title: 'Home',
     };
 
-    // message: {
-    // status: string,
-    // id: string
-    // }
 
     componentDidMount() {
+        const that = this;
         DeviceEventEmitter.addListener('info', function(result: Event) {
-            this.props.addMessage(result);
+            that.props.addMessage(result);
         });
     }
 
     sendSMSFunction(type: 'ON' | 'OFF') {
-        const { number, contentOn, contentOff } = this.props.config;
+        const { number, messageOn, messageOff } = this.props.config;
         
         if (!number) {
             return ToastAndroid.show('Brakuje numeru telefonu', ToastAndroid.SHORT);
@@ -47,7 +44,7 @@ class HomeScreen extends Component {
 
         const id = moment().valueOf();
 
-        SMS.send(String(id), String(number), type === 'ON' ? contentOn : contentOff, type);
+        SMS.send(String(id), String(number), type === 'ON' ? messageOn : messageOff, type);
     }
     render() {
         const { navigate } = this.props.navigation;
@@ -130,7 +127,7 @@ const mapState = (state) => ({
 });
 
 const mapDispatch = (dispatch)=>({
-    addMessage: (message) => dispatch(addMessage((message))),
+    addMessage: (message) => dispatch(addMessage(message)),
 });
 
 const ConnectedHomeScreen = connect(mapState, mapDispatch)(HomeScreen);
