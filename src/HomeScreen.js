@@ -3,11 +3,8 @@ import moment from 'moment';
 import { connect } from 'react-redux'
 import { addMessage } from './state/message';
 import {
-    AsyncStorage,
-    ScrollView,    
-    AppRegistry,
+    ScrollView,
     StyleSheet,
-    Button,
     Text,
     View,
     TouchableOpacity,
@@ -32,41 +29,15 @@ class HomeScreen extends Component {
     // status: string,
     // id: string
     // }
-    state = {
-        messages: [],
-        number: '',
-        contentOn: '',
-        contentOff: ''
-    };
 
     componentDidMount() {
-        alert(JSON.stringify(this.props))
-        const that = this;
         DeviceEventEmitter.addListener('info', function(result: Event) {
-            AsyncStorage.getItem('messages').then( res => {
-                let messages = !res ? [] : JSON.parse(res);
-
-                messages.push(result);
-
-                AsyncStorage.setItem('messages', JSON.stringify(messages)).then(()=>{
-                    that.setState({ messages });
-                })
-            });
+            this.props.addMessage(result);
         });
-
-        AsyncStorage.multiGet(['number','contentOn', 'contentOff', 'messages'])
-            .then(([[a, number], [b, contentOn], [c, contentOff], [d, messages]]) => {
-                this.setState({
-                    number: number ? number : '',
-                    contentOn: contentOn ? contentOn : '',
-                    contentOff: contentOff ? contentOff : '',
-                    messages: messages ? JSON.parse(messages) : [],
-                })
-            });
     }
 
     sendSMSFunction(type) { //ON | OFF
-        const { number, contentOn, contentOff } = this.state;
+        const { number, contentOn, contentOff } = this.props.config;
         
         if (!number) {
             return ToastAndroid.show('Brakuje numeru telefonu', ToastAndroid.SHORT);
@@ -78,8 +49,8 @@ class HomeScreen extends Component {
     }
     render() {
         const { navigate } = this.props.navigation;
-        let { messages } = this.state;
-        messages = messages.map( m =><Row type={m.type} key={m.id} id={m.id} status={m.status} />) 
+        let { messages } = this.props;
+        messages = messages.map( m =><Row type={m.type} key={m.id} id={m.id} status={m.status} />);
 
         return (
             <View style={styles.container}>        
@@ -151,12 +122,13 @@ const styles = StyleSheet.create({
     }
 });
 
-const mapState = (state)=>({
-   messages: state
+const mapState = (state) => ({
+    messages: state.messages,
+    config: state.config
 });
 
 const mapDispatch = (dispatch)=>({
-  addMessage: (message) => dispatch(addMessage((message)))
+    addMessage: (message) => dispatch(addMessage((message))),
 });
 
 const ConnectedHomeScreen = connect(mapState, mapDispatch)(HomeScreen);

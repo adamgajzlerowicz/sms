@@ -1,5 +1,7 @@
 import React from 'react';
-import { 
+import { setConfig } from './state/config';
+import { connect } from 'react-redux'
+import {
     View, 
     ToastAndroid,
     AsyncStorage,
@@ -7,43 +9,29 @@ import {
     Button
 } from 'react-native';
 
-export default class HomeScreen extends React.Component {
+class OptionsScreen extends React.Component {
     static navigationOptions = {
         title: 'Opcje',
     };
-    state = {
-        number: '',
-        contentOn: '',
-        contentOff: ''
-    }
 
-    componentDidMount() {
-        AsyncStorage.multiGet(['number','contentOn', 'contentOff'])
-            .then(([[a, number], [b, contentOn], [c, contentOff]]) => {
-                this.setState({
-                    number: number ? number : '',
-                    contentOn: contentOn ? contentOn : '',
-                    contentOff: contentOff ? contentOff : '',
-                })
-            });
-    }
+    state = {
+        number: this.props.number,
+        messageOn: this.props.messageOn,
+        messageOff: this.props.messageOff
+    };
 
     setData() {
-        AsyncStorage.multiSet([
-            ['number', this.state.number],
-            ['contentOn', this.state.contentOn], 
-            ['contentOff', this.state.contentOff]
-        ])
-            .then(()=>ToastAndroid.show('Zapisano', ToastAndroid.SHORT));
+        this.props.setConfig(this.state);
+        ToastAndroid.show('Zapisano', ToastAndroid.SHORT);
     };
 
     render() {
-        const { navigate } = this.props.navigation;
+        // const { navigate } = this.props.navigation;
         return (
             <View>
                 <TextInput placeholder={'Numer'} value={this.state.number} onChangeText={(number)=>this.setState({number})}/>
-                <TextInput placeholder={'Wiadomosc ON'} value={this.state.contentOn} onChangeText={(contentOn)=>this.setState({contentOn})}/>
-                <TextInput placeholder={'Wiadomosc OFF'} value={this.state.contentOff} onChangeText={(contentOff)=>this.setState({contentOff})}/>
+                <TextInput placeholder={'Wiadomosc ON'} value={this.state.messageOn} onChangeText={(messageOn)=>this.setState({messageOn})}/>
+                <TextInput placeholder={'Wiadomosc OFF'} value={this.state.messageOff} onChangeText={(messageOff)=>this.setState({ messageOff })}/>
                 <Button
                     title="Zapisz"
                     onPress={() => this.setData()}
@@ -52,3 +40,15 @@ export default class HomeScreen extends React.Component {
         );
     }
 }
+
+const mapState = (state) => ({
+    config: state.config
+});
+
+const mapDispatch = (dispatch)=> ({
+    setConfig: (payload) => dispatch(setConfig(payload))
+});
+
+const ConnectedOptionsScreen = connect(mapState, mapDispatch)(OptionsScreen);
+
+export default ConnectedOptionsScreen;

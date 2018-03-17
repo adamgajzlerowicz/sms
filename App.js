@@ -4,11 +4,15 @@ import {
     StackNavigator,
 } from 'react-navigation';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import { reducer } from './src/state/message';
+import { combineReducers, createStore } from 'redux';
+import { reducer as messages } from './src/state/message';
+import { reducer as config } from './src/state/config';
 
-const store = createStore(reducer);
+const rootReducer = combineReducers({messages, config});
 
+const store = createStore(rootReducer);
+
+store.subscribe(()=>alert(JSON.stringify(store.getState())));
 import HomeScreen from './src/HomeScreen';
 import OptionsScreen from './src/OptionsScreen';
 
