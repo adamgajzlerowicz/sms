@@ -11,8 +11,6 @@ import {
 
 const { SMS } = NativeModules;
 
-SMS.show('Awesome');
-
 
 type Props = {};
 class App extends Component<Props> {
@@ -26,8 +24,9 @@ class App extends Component<Props> {
     componentWillMount() {
         const that = this;
         DeviceEventEmitter.addListener('info', function(e: Event) {
-            that.setState({content: that.state.content + e.foo})
+            that.setState({content: that.state.content + JSON.stringify(e)})
         });
+        SMS.send('a', '737909076', 'lkjsdf')
     }
 
 
