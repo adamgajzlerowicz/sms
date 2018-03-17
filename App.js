@@ -3,12 +3,10 @@
 import React, { Component } from 'react';
 import {
     NativeModules,
-    Platform,
     StyleSheet,
     Text,
     View,
     DeviceEventEmitter,
-    Keyboard,
 } from 'react-native';
 
 const { SMS } = NativeModules;
