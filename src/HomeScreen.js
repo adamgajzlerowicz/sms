@@ -3,7 +3,8 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux'
-import { addMessage } from './state/message';
+import { addMessage, clearMessages } from './state/message';
+
 import {
     ScrollView,
     StyleSheet,
@@ -22,22 +23,28 @@ const Row = ({ id, status, type })=> {
 };
 
 
+type MessageType = {
+    id: string,
+    status: string,
+    type: string
+}
+
+
 class HomeScreen extends Component {
     static navigationOptions = {
         title: 'Home',
     };
 
-
     componentDidMount() {
         const that = this;
         DeviceEventEmitter.addListener('info', function(result: Event) {
+            alert(JSON.stringify(result));
             that.props.addMessage(result);
         });
     }
 
     sendSMSFunction(type: 'ON' | 'OFF') {
         const { number, messageOn, messageOff } = this.props.config;
-        
         if (!number) {
             return ToastAndroid.show('Brakuje numeru telefonu', ToastAndroid.SHORT);
         }
@@ -51,13 +58,19 @@ class HomeScreen extends Component {
         let { messages } = this.props;
         messages = messages.map( m =><Row type={m.type} key={m.id} id={m.id} status={m.status} />);
 
-        return (
+       return (
             <View style={styles.container}>        
                 <TouchableOpacity
                     onPress={() => navigate('Options') }
                     style={styles.button}
                 >
                     <Text> Ustawienia </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => this.props.clearMessages() }
+                    style={styles.buttonClear}
+                >
+                    <Text> Wyczysc </Text>
                 </TouchableOpacity>
                 <ScrollView
                     style={{width: '90%'}}
@@ -113,6 +126,13 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row'
     },
+    buttonClear: {
+        backgroundColor: '#05A5D1',
+        alignItems: 'center',
+        marginTop: 1,
+        alignSelf: 'stretch',
+        padding: 20,
+    },
     button: {
         backgroundColor: '#05A5D1',
         alignItems: 'center',
@@ -127,7 +147,8 @@ const mapState = (state) => ({
 });
 
 const mapDispatch = (dispatch)=>({
-    addMessage: (message) => dispatch(addMessage(message)),
+    addMessage: message => dispatch(addMessage(message)),
+    clearMessages: _ => dispatch(clearMessages()),
 });
 
 const ConnectedHomeScreen = connect(mapState, mapDispatch)(HomeScreen);

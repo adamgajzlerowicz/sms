@@ -20,10 +20,8 @@ const enchancer = compose(persistState(storage, 'redux'));
 
 const store = createStore(rootReducer, {}, enchancer);
 
-// store.subscribe(()=>alert(JSON.stringify(store.getState())));
 import HomeScreen from './src/HomeScreen';
 import OptionsScreen from './src/OptionsScreen';
-
 
 
 const Navigator = StackNavigator({
