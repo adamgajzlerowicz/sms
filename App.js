@@ -1,16 +1,17 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+// @flow
 
 import React, { Component } from 'react';
 import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
+    NativeModules,
+    Platform,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
+
+const { ToastExample } = NativeModules;
+
+ToastExample.show('Awesome', ToastExample.SHORT);
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
