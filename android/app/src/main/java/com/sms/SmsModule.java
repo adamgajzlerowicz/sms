@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.annotation.Nullable;
 import android.telephony.SmsManager;
 
 import com.facebook.react.bridge.Arguments;
@@ -25,10 +24,11 @@ public class SmsModule extends ReactContextBaseJavaModule {
         return "SMS";
     }
 
-    private void sendEvent(String messageId, String status) {
+    private void sendEvent(String messageId, String status, String type) {
         WritableMap params = Arguments.createMap();
-        params.putString("messageId", messageId);
+        params.putString("id", messageId);
         params.putString("status", status);
+        params.putString("type", type);
 
         this.reactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
@@ -44,7 +44,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
 
     //---sends an SMS message to another device---
     @ReactMethod
-    public void send(final String messageId, String phoneNumber, String message){
+    public void send(final String messageId, String phoneNumber, String message, final String type){
 
         try {
             String SENT = "SMS_SENT";
@@ -64,19 +64,19 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            sendEvent(messageId, "SMS sent");
+                            sendEvent(messageId, "SMS sent", type);
                             break;
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            sendEvent(messageId, "Generic failure");
+                            sendEvent(messageId, "Generic failure", type);
                             break;
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            sendEvent(messageId, "No service");
+                            sendEvent(messageId, "No service", type);
                             break;
                         case SmsManager.RESULT_ERROR_NULL_PDU:
-                            sendEvent(messageId, "Null PDU");
+                            sendEvent(messageId, "Null PDU", type);
                             break;
                         case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            sendEvent(messageId, "Radio off");
+                            sendEvent(messageId, "Radio off", type);
                             break;
                     }
                 }
@@ -89,10 +89,10 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            sendEvent(messageId, "SMS delivered");
+                            sendEvent(messageId, "SMS delivered", type);
                             break;
                         case Activity.RESULT_CANCELED:
-                            sendEvent(messageId, "SMS not delivered");
+                            sendEvent(messageId, "SMS not delivered", type);
                             break;
                     }
                 }
@@ -101,7 +101,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
             SmsManager sms = SmsManager.getDefault();
             sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
         } catch (Exception e) {
-            sendEvent(messageId, "Unknown error");
+            sendEvent(messageId, "Unknown error", type);
             throw e;
 
         }
