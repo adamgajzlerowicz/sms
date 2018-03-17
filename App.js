@@ -18,10 +18,17 @@ SMS.show('Awesome');
 
 type Props = {};
 class App extends Component<Props> {
+    constructor(f) {
+       super(f);
+       this.state = {
+           content: 'dupa'
+       }
 
+    }
     componentWillMount() {
-        Keyboard.addListener('keyboardWillShow', function(e: Event) {
-            alert(JSON.stringify(e));
+        const that = this;
+        DeviceEventEmitter.addListener('info', function(e: Event) {
+            that.setState({content: that.state.content + e.foo})
         });
     }
 
@@ -30,7 +37,7 @@ class App extends Component<Props> {
         return (
             <View style={styles.container}>
                 <Text style={styles.welcome}>
-                    dupa
+                    {this.state.content}
                 </Text>
             </View>
         );
