@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
+import { connect } from 'react-redux'
+import { addMessage } from './state/message';
 import {
     AsyncStorage,
     ScrollView,    
@@ -21,7 +23,7 @@ const Row = ({ id, status, type })=> {
 };
 
 
-export default class RNSMS extends Component {
+class HomeScreen extends Component {
     static navigationOptions = {
         title: 'Home',
     };
@@ -38,6 +40,7 @@ export default class RNSMS extends Component {
     };
 
     componentDidMount() {
+        alert(JSON.stringify(this.props))
         const that = this;
         DeviceEventEmitter.addListener('info', function(result: Event) {
             AsyncStorage.getItem('messages').then( res => {
@@ -147,3 +150,15 @@ const styles = StyleSheet.create({
         padding: 20,
     }
 });
+
+const mapState = (state)=>({
+   messages: state
+});
+
+const mapDispatch = (dispatch)=>({
+  addMessage: (message) => dispatch(addMessage((message)))
+});
+
+const ConnectedHomeScreen = connect(mapState, mapDispatch)(HomeScreen);
+
+export default ConnectedHomeScreen;
