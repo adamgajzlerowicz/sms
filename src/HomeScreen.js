@@ -19,7 +19,7 @@ import {
 const { SMS } = NativeModules;
 
 const Row = ({ id, status, type })=> {
-    return <Text style={{padding: 10}}> {type}: {moment(Number(id)).format('YYYY-MM-DD HH:mm:ss')} {':         '} {status} </Text>;
+    return <Text style={{padding: 10}}> {type}: {moment(Number(id)).format('YYYY-MM-DD HH:mm:ss')}{':         '} {status} </Text>;
 };
 
 
@@ -38,7 +38,6 @@ class HomeScreen extends Component {
     componentDidMount() {
         const that = this;
         DeviceEventEmitter.addListener('info', function(result: Event) {
-            alert(JSON.stringify(result));
             that.props.addMessage(result);
         });
     }

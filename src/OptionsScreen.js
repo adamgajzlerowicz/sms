@@ -25,7 +25,6 @@ class OptionsScreen extends React.Component {
     };
 
     render() {
-        // const { navigate } = this.props.navigation;
         return (
             <View>
                 <TextInput placeholder={'Numer'} value={this.state.number} onChangeText={(number)=>this.setState({number})}/>

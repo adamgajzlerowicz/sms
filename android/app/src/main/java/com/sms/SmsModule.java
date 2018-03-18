@@ -9,11 +9,14 @@ import android.content.IntentFilter;
 import android.telephony.SmsManager;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+import java.util.Random;
 
 public class SmsModule extends ReactContextBaseJavaModule {
 
@@ -44,23 +47,32 @@ public class SmsModule extends ReactContextBaseJavaModule {
 
     //---sends an SMS message to another device---
     @ReactMethod
-    public void send(final String messageId, String phoneNumber, String message, final String type){
+    public void send(final String messageId,
+                     String phoneNumber,
+                     String message,
+                     final String type
+    ){
 
         try {
-            String SENT = "SMS_SENT";
-            String DELIVERED = "SMS_DELIVERED";
+            String SENT = "SMS_SENT" + messageId;
+            String DELIVERED = "SMS_DELIVERED" + messageId;
 
-            PendingIntent sentPI = PendingIntent.getBroadcast(reactContext, 0,
-                    new Intent(SENT), 0);
+            Random generator = new Random();
 
-            PendingIntent deliveredPI = PendingIntent.getBroadcast(reactContext, 0,
-                    new Intent(DELIVERED), 0);
+            final Intent sentIntent = new Intent(SENT);
+            sentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            final PendingIntent sentPI = PendingIntent.getBroadcast(reactContext, generator.nextInt(),
+                    sentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            Intent deliveryIntent = new Intent(DELIVERED);
+            PendingIntent deliveredPI = PendingIntent.getBroadcast(reactContext, generator.nextInt() ,
+                    deliveryIntent, 0);
+
 
             //---when the SMS has been sent---
             reactContext.registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
-                    System.out.println("sent callback");
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
@@ -79,6 +91,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             sendEvent(messageId, "Radio off", type);
                             break;
                     }
+
                 }
             }, new IntentFilter(SENT));
 
@@ -95,6 +108,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             sendEvent(messageId, "SMS not delivered", type);
                             break;
                     }
+                    reactContext.unregisterReceiver(this);
                 }
             }, new IntentFilter(DELIVERED));
 
