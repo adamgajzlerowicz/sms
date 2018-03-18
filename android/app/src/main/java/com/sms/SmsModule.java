@@ -89,13 +89,13 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             sendEvent(messageId, "Blad ogolny", type, RED);
                             break;
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            sendEvent(messageId, "Nie ma polaczenia z siecia", type, RED);
+                            sendEvent(messageId, "Brak polaczenia z siecia", type, RED);
                             break;
                         case SmsManager.RESULT_ERROR_NULL_PDU:
                             sendEvent(messageId, "Brak PDU", type, RED);
                             break;
                         case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            sendEvent(messageId, "Nie ma zasiegu", type, RED);
+                            sendEvent(messageId, "Brak sygnalu", type, RED);
                             break;
                     }
 
@@ -109,10 +109,10 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            sendEvent(messageId, "Wiadomosc dostarczona", type, GREEN);
+                            sendEvent(messageId, "Dostarczono", type, GREEN);
                             break;
                         case Activity.RESULT_CANCELED:
-                            sendEvent(messageId, "Wiaodomosc nie dostarczona", type, RED);
+                            sendEvent(messageId, "Nie dostarczono", type, RED);
                             break;
                     }
                     reactContext.unregisterReceiver(this);
