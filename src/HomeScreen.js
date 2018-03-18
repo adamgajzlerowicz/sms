@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux'
 import { addMessage, clearMessages } from './state/message';
+import FontAwesome, { Icons } from 'react-native-fontawesome';
 
 import {
     ScrollView,
@@ -18,8 +19,13 @@ import {
 
 const { SMS } = NativeModules;
 
-const Row = ({ id, status, type })=> {
-    return <Text style={{padding: 10}}> {type}: {moment(Number(id)).format('YYYY-MM-DD HH:mm:ss')}{':         '} {status} </Text>;
+const Row = ({ id, status, type, color })=> {
+    return (
+        <Text style={{padding: 10}}>
+            {type}: {moment(Number(id)).format('YYYY-MM-DD HH:mm:ss')}{':         '}
+            {status} <FontAwesome style={{color}}>{Icons.circle}</FontAwesome>
+        </Text>
+    );
 };
 
 
@@ -55,7 +61,7 @@ class HomeScreen extends Component {
     render() {
         const { navigate } = this.props.navigation;
         let { messages } = this.props;
-        messages = messages.map( m =><Row type={m.type} key={m.id} id={m.id} status={m.status} />);
+        messages = messages.map( m =><Row key={m.id} {...m}/>);
 
        return (
             <View style={styles.container}>        

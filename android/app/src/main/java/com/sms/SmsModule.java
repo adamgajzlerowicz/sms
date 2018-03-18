@@ -27,11 +27,12 @@ public class SmsModule extends ReactContextBaseJavaModule {
         return "SMS";
     }
 
-    private void sendEvent(String messageId, String status, String type) {
+    private void sendEvent(String messageId, String status, String type, String color) {
         WritableMap params = Arguments.createMap();
         params.putString("id", messageId);
         params.putString("status", status);
         params.putString("type", type);
+        params.putString("color", color);
 
         this.reactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
@@ -45,6 +46,10 @@ public class SmsModule extends ReactContextBaseJavaModule {
         this.reactContext = reactContext;
     }
 
+    private final String BLUE = "#98AFC7";
+    private final String RED = "#E55451";
+    private final String GREEN = "#89C35C";
+
     //---sends an SMS message to another device---
     @ReactMethod
     public void send(final String messageId,
@@ -56,6 +61,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
         try {
             String SENT = "SMS_SENT" + messageId;
             String DELIVERED = "SMS_DELIVERED" + messageId;
+
 
             Random generator = new Random();
 
@@ -69,6 +75,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     deliveryIntent, 0);
 
 
+
             //---when the SMS has been sent---
             reactContext.registerReceiver(new BroadcastReceiver(){
                 @Override
@@ -76,19 +83,19 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            sendEvent(messageId, "SMS sent", type);
+                            sendEvent(messageId, "Wyslano", type, BLUE);
                             break;
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            sendEvent(messageId, "Generic failure", type);
+                            sendEvent(messageId, "Blad ogolny", type, RED);
                             break;
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            sendEvent(messageId, "No service", type);
+                            sendEvent(messageId, "Nie ma polaczenia z siecia", type, RED);
                             break;
                         case SmsManager.RESULT_ERROR_NULL_PDU:
-                            sendEvent(messageId, "Null PDU", type);
+                            sendEvent(messageId, "Brak PDU", type, RED);
                             break;
                         case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            sendEvent(messageId, "Radio off", type);
+                            sendEvent(messageId, "Nie ma zasiegu", type, RED);
                             break;
                     }
 
@@ -102,10 +109,10 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            sendEvent(messageId, "SMS delivered", type);
+                            sendEvent(messageId, "Wiadomosc dostarczona", type, GREEN);
                             break;
                         case Activity.RESULT_CANCELED:
-                            sendEvent(messageId, "SMS not delivered", type);
+                            sendEvent(messageId, "Wiaodomosc nie dostarczona", type, RED);
                             break;
                     }
                     reactContext.unregisterReceiver(this);
@@ -115,7 +122,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
             SmsManager sms = SmsManager.getDefault();
             sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
         } catch (Exception e) {
-            sendEvent(messageId, "Unknown error", type);
+            sendEvent(messageId, "Nieznany blad - to niedobrze!", type, RED);
             throw e;
 
         }
