@@ -6,6 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.telephony.SmsManager;
 
 import com.facebook.react.bridge.Arguments;
@@ -80,6 +83,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
             reactContext.registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
+                    reactContext.unregisterReceiver(this);
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
@@ -106,6 +110,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
             reactContext.registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
+                    reactContext.unregisterReceiver(this);
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
@@ -115,7 +120,14 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             sendEvent(messageId, "Nie dostarczono", type, RED);
                             break;
                     }
-                    reactContext.unregisterReceiver(this);
+                    try {
+                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        Ringtone r = RingtoneManager.getRingtone(reactContext, notification);
+                        r.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }, new IntentFilter(DELIVERED));
 
