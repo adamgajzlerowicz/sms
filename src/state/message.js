@@ -1,21 +1,22 @@
-
 const ADD_MESSAGE = 'ADD_MESSAGE';
 const CLEAR_MESSAGES = 'CLEAR_MESSAGES';
 
-const reducer = (state = [], action)=>{
-    switch (action.type){
+const defaultState = {};
+
+const reducer = (state = defaultState, action) => {
+    switch (action.type) {
         case ADD_MESSAGE:
-            return [...state, action.payload];
+            return {...state, [action.payload.id]: action.payload};
         case CLEAR_MESSAGES:
-            return [];
+            return defaultState;
         default:
             return state;
     }
 
 };
 
-const addMessage = message => ({ type: ADD_MESSAGE, payload: message });
-const clearMessages = (_) => ({ type: CLEAR_MESSAGES });
+const addMessage = message => ({type: ADD_MESSAGE, payload: message});
+const clearMessages = () => ({type: CLEAR_MESSAGES});
 
 export {
     reducer, addMessage, clearMessages

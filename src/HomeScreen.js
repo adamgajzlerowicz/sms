@@ -61,7 +61,7 @@ class HomeScreen extends Component {
     render() {
         const { navigate } = this.props.navigation;
         let { messages } = this.props;
-        messages = messages.map( m =><Row key={m.id} {...m}/>);
+        messages = Object.keys(messages).map( m =><Row key={messages[m].id} {...messages[m]}/>);
 
        return (
             <View style={styles.container}>        
