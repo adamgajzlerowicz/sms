@@ -1,12 +1,14 @@
 package com.sms;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -84,7 +86,6 @@ public class SmsModule extends ReactContextBaseJavaModule {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
 
-
                     reactContext.unregisterReceiver(this);
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
@@ -113,29 +114,22 @@ public class SmsModule extends ReactContextBaseJavaModule {
                 public void onReceive(Context arg0, Intent arg1) {
                     reactContext.unregisterReceiver(this);
 
+                    try {
+                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        Ringtone r = RingtoneManager.getRingtone(getReactApplicationContext(), notification);
+                        r.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
-
-
                             sendEvent(messageId, "Dostarczono", type, GREEN);
                             break;
                         case Activity.RESULT_CANCELED:
                             sendEvent(messageId, "Nie dostarczono", type, RED);
                             break;
                     }
-                    //Define Notification Manager
-                    NotificationManager notificationManager = (NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                    //Define sound URI
-                    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getReactApplicationContext())
-                            .setContentTitle("foo")
-                            .setContentText("bar")
-                            .setSound(soundUri); //This sets the sound to play
-
-                    //Display notification
-                    notificationManager.notify(0, mBuilder.build());
 
                 }
             }, new IntentFilter(DELIVERED));
