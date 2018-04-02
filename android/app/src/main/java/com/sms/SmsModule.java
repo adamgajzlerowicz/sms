@@ -85,7 +85,6 @@ public class SmsModule extends ReactContextBaseJavaModule {
                 public void onReceive(Context arg0, Intent arg1) {
 
 
-
                     reactContext.unregisterReceiver(this);
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
@@ -113,21 +112,10 @@ public class SmsModule extends ReactContextBaseJavaModule {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     reactContext.unregisterReceiver(this);
+
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
-                            //Define Notification Manager
-                            NotificationManager notificationManager = (NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-                            //Define sound URI
-                            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getReactApplicationContext())
-                                    .setContentTitle("foo")
-                                    .setContentText("bar")
-                                    .setSound(soundUri); //This sets the sound to play
-
-                            //Display notification
-                            notificationManager.notify(0, mBuilder.build());
 
                             sendEvent(messageId, "Dostarczono", type, GREEN);
                             break;
@@ -135,7 +123,19 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             sendEvent(messageId, "Nie dostarczono", type, RED);
                             break;
                     }
+                    //Define Notification Manager
+                    NotificationManager notificationManager = (NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
+                    //Define sound URI
+                    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getReactApplicationContext())
+                            .setContentTitle("foo")
+                            .setContentText("bar")
+                            .setSound(soundUri); //This sets the sound to play
+
+                    //Display notification
+                    notificationManager.notify(0, mBuilder.build());
 
                 }
             }, new IntentFilter(DELIVERED));
