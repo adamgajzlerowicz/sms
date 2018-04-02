@@ -1,6 +1,7 @@
 package com.sms;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 
 import com.facebook.react.bridge.Arguments;
@@ -43,7 +45,6 @@ public class SmsModule extends ReactContextBaseJavaModule {
     }
 
 
-
     SmsModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
@@ -59,7 +60,7 @@ public class SmsModule extends ReactContextBaseJavaModule {
                      String phoneNumber,
                      String message,
                      final String type
-    ){
+    ) {
 
         try {
             String SENT = "SMS_SENT" + messageId;
@@ -74,18 +75,19 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     sentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
             Intent deliveryIntent = new Intent(DELIVERED);
-            PendingIntent deliveredPI = PendingIntent.getBroadcast(reactContext, generator.nextInt() ,
+            PendingIntent deliveredPI = PendingIntent.getBroadcast(reactContext, generator.nextInt(),
                     deliveryIntent, 0);
 
 
-
             //---when the SMS has been sent---
-            reactContext.registerReceiver(new BroadcastReceiver(){
+            reactContext.registerReceiver(new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
+
+
+
                     reactContext.unregisterReceiver(this);
-                    switch (getResultCode())
-                    {
+                    switch (getResultCode()) {
                         case Activity.RESULT_OK:
                             sendEvent(messageId, "Wyslano", type, BLUE);
                             break;
@@ -107,12 +109,11 @@ public class SmsModule extends ReactContextBaseJavaModule {
             }, new IntentFilter(SENT));
 
             //---when the SMS has been delivered---
-            reactContext.registerReceiver(new BroadcastReceiver(){
+            reactContext.registerReceiver(new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     reactContext.unregisterReceiver(this);
-                    switch (getResultCode())
-                    {
+                    switch (getResultCode()) {
                         case Activity.RESULT_OK:
                             sendEvent(messageId, "Dostarczono", type, GREEN);
                             break;
@@ -120,13 +121,20 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             sendEvent(messageId, "Nie dostarczono", type, RED);
                             break;
                     }
-                    try {
-                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                        Ringtone r = RingtoneManager.getRingtone(reactContext, notification);
-                        r.play();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+
+                    //Define Notification Manager
+                    NotificationManager notificationManager = (NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    //Define sound URI
+                    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getReactApplicationContext())
+                            .setContentTitle("foo")
+                            .setContentText("bar")
+                            .setSound(soundUri); //This sets the sound to play
+
+                    //Display notification
+                    notificationManager.notify(0, mBuilder.build());
 
                 }
             }, new IntentFilter(DELIVERED));
@@ -136,7 +144,6 @@ public class SmsModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             sendEvent(messageId, "Nieznany blad - to niedobrze!", type, RED);
             throw e;
-
         }
 
     }
