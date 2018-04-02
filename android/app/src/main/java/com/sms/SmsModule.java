@@ -115,6 +115,20 @@ public class SmsModule extends ReactContextBaseJavaModule {
                     reactContext.unregisterReceiver(this);
                     switch (getResultCode()) {
                         case Activity.RESULT_OK:
+                            //Define Notification Manager
+                            NotificationManager notificationManager = (NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                            //Define sound URI
+                            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getReactApplicationContext())
+                                    .setContentTitle("foo")
+                                    .setContentText("bar")
+                                    .setSound(soundUri); //This sets the sound to play
+
+                            //Display notification
+                            notificationManager.notify(0, mBuilder.build());
+
                             sendEvent(messageId, "Dostarczono", type, GREEN);
                             break;
                         case Activity.RESULT_CANCELED:
@@ -122,19 +136,6 @@ public class SmsModule extends ReactContextBaseJavaModule {
                             break;
                     }
 
-                    //Define Notification Manager
-                    NotificationManager notificationManager = (NotificationManager) reactContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                    //Define sound URI
-                    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getReactApplicationContext())
-                            .setContentTitle("foo")
-                            .setContentText("bar")
-                            .setSound(soundUri); //This sets the sound to play
-
-                    //Display notification
-                    notificationManager.notify(0, mBuilder.build());
 
                 }
             }, new IntentFilter(DELIVERED));
